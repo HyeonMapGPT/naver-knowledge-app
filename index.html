@@ -17,9 +17,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #03c75a, #00a651);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 20px;
         }
         
         .container {
@@ -27,9 +25,8 @@
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
         }
         
         .logo {
@@ -50,33 +47,61 @@
             color: #333;
             margin-bottom: 10px;
             font-size: 24px;
+            text-align: center;
         }
         
         .subtitle {
             color: #666;
             margin-bottom: 30px;
             font-size: 16px;
+            text-align: center;
         }
         
-        .feature {
-            background: #f8f9fa;
-            padding: 15px;
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
             border-radius: 10px;
-            margin: 10px 0;
-            text-align: left;
         }
         
-        .feature h3 {
+        .section h3 {
             color: #03c75a;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
             margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
         }
         
-        .feature p {
-            color: #666;
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
             font-size: 14px;
+            transition: border-color 0.3s;
         }
         
-        .install-btn {
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #03c75a;
+        }
+        
+        .input-group textarea {
+            height: 200px;
+            resize: vertical;
+            font-family: monospace;
+        }
+        
+        .btn {
             background: #03c75a;
             color: white;
             border: none;
@@ -84,14 +109,33 @@
             border-radius: 25px;
             font-size: 16px;
             font-weight: bold;
-            margin: 20px 0;
             cursor: pointer;
             transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 10px;
         }
         
-        .install-btn:hover {
+        .btn:hover {
             background: #00a651;
             transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .log-area {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            color: #333;
         }
         
         .status {
@@ -102,6 +146,15 @@
             margin: 15px 0;
             font-size: 14px;
         }
+        
+        .example-urls {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -110,35 +163,186 @@
         <h1>네이버 지식인 자동화</h1>
         <p class="subtitle">아이폰에서 앱처럼 사용하세요</p>
         
-        <div class="feature">
-            <h3>✅ 자동 로그인</h3>
-            <p>네이버 계정으로 자동 로그인</p>
+        <!-- 로그인 섹션 -->
+        <div class="section">
+            <h3>🔐 네이버 로그인</h3>
+            <div class="input-group">
+                <label for="naverId">네이버 아이디:</label>
+                <input type="text" id="naverId" placeholder="네이버 아이디를 입력하세요">
+            </div>
+            <div class="input-group">
+                <label for="naverPassword">네이버 비밀번호:</label>
+                <input type="password" id="naverPassword" placeholder="네이버 비밀번호를 입력하세요">
+            </div>
         </div>
         
-        <div class="feature">
-            <h3>✅ URL 자동 열기</h3>
-            <p>복사한 URL들을 순차적으로 자동 열기</p>
+        <!-- URL 입력 섹션 -->
+        <div class="section">
+            <h3>📝 지식인 URL 목록</h3>
+            <div class="input-group">
+                <label for="urlList">네이버 지식인 URL들을 한 줄에 하나씩 입력하세요:</label>
+                <textarea id="urlList" placeholder="https://kin.naver.com/qna/detail.naver?d1id=6&dirId=6010103&docId=484325352&enc=utf8&kinsrch_src=pc_tab_kin&qb=7KO866+865Ox66GdIOyduO2EsOuEtyDrsJzquIk%3D&answerNo=16
+https://kin.naver.com/qna/detail.naver?d1id=6&dirId=6010103&docId=479367538&enc=utf8&kinsrch_src=pc_tab_kin&qb=7KO866+865Ox66GdIOyduO2EsOuEtyDrsJzquIk%3D&answerNo=19
+https://kin.naver.com/qna/detail.naver?d1id=6&dirId=60103&docId=477548341&enc=utf8&kinsrch_src=pc_tab_kin&qb=7Yag7KeA64yA7J6lIOyXtOuejA%3D%3D&answerNo=13"></textarea>
+            </div>
+            <div class="example-urls">
+                <strong>예시 URL 형식:</strong><br>
+                https://kin.naver.com/qna/detail.naver?d1id=6&dirId=6010103&docId=484325352&enc=utf8&kinsrch_src=pc_tab_kin&qb=7KO866+865Ox66GdIOyduO2EsOuEtyDrsJzquIk%3D&answerNo=16
+            </div>
         </div>
         
-        <div class="feature">
-            <h3>✅ 계정 관리</h3>
-            <p>여러 계정을 안전하게 관리</p>
+        <!-- 실행 버튼 -->
+        <div class="section">
+            <h3>🚀 자동화 실행</h3>
+            <button class="btn" id="startBtn" onclick="startAutomation()">네이버 로그인 및 URL 자동 열기 시작</button>
+            <button class="btn" id="stopBtn" onclick="stopAutomation()" style="background: #dc3545; display: none;">자동화 중지</button>
+        </div>
+        
+        <!-- 로그 영역 -->
+        <div class="section">
+            <h3>📋 실행 로그</h3>
+            <div class="log-area" id="logArea">
+                자동화를 시작하려면 위의 정보를 입력하고 "시작" 버튼을 클릭하세요.
+            </div>
         </div>
         
         <div class="status">
             🎯 PWA 앱으로 설치하여 재인증 없이 사용 가능!
         </div>
-        
-        <button class="install-btn" onclick="installApp()">
-            홈 화면에 추가
-        </button>
-        
-        <p style="color: #999; font-size: 12px; margin-top: 20px;">
-            Safari에서 공유 버튼 → "홈 화면에 추가" 선택
-        </p>
     </div>
 
     <script>
+        let isRunning = false;
+        let currentUrls = [];
+        let currentIndex = 0;
+        
+        // 로그 출력 함수
+        function log(message) {
+            const logArea = document.getElementById('logArea');
+            const timestamp = new Date().toLocaleTimeString();
+            logArea.innerHTML += `[${timestamp}] ${message}\n`;
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+        
+        // 자동화 시작
+        function startAutomation() {
+            const naverId = document.getElementById('naverId').value.trim();
+            const naverPassword = document.getElementById('naverPassword').value.trim();
+            const urlList = document.getElementById('urlList').value.trim();
+            
+            // 입력 검증
+            if (!naverId || !naverPassword) {
+                alert('네이버 아이디와 비밀번호를 모두 입력해주세요!');
+                return;
+            }
+            
+            if (!urlList) {
+                alert('지식인 URL 목록을 입력해주세요!');
+                return;
+            }
+            
+            // URL 목록 파싱
+            currentUrls = urlList.split('\n').filter(url => url.trim());
+            
+            if (currentUrls.length === 0) {
+                alert('유효한 URL이 없습니다!');
+                return;
+            }
+            
+            log(`자동화 시작: ${currentUrls.length}개의 URL`);
+            log(`네이버 아이디: ${naverId}`);
+            log('=' * 50);
+            
+            // UI 상태 변경
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'block';
+            isRunning = true;
+            
+            // 자동화 실행
+            runAutomation(naverId, naverPassword);
+        }
+        
+        // 자동화 실행
+        async function runAutomation(naverId, naverPassword) {
+            try {
+                // 1. 네이버 로그인
+                log('네이버 로그인 시도 중...');
+                await loginToNaver(naverId, naverPassword);
+                
+                // 2. URL들 순차적으로 열기
+                log('URL들을 순차적으로 열기 시작...');
+                for (let i = 0; i < currentUrls.length; i++) {
+                    if (!isRunning) break;
+                    
+                    const url = currentUrls[i].trim();
+                    if (url) {
+                        log(`${i + 1}/${currentUrls.length}: ${url} 열기 중...`);
+                        window.open(url, '_blank');
+                        
+                        // 2-3초 랜덤 대기
+                        const waitTime = Math.random() * 1000 + 2000; // 2-3초
+                        log(`다음 URL까지 ${Math.round(waitTime/1000)}초 대기...`);
+                        await sleep(waitTime);
+                    }
+                }
+                
+                if (isRunning) {
+                    log('모든 URL 열기 완료!');
+                } else {
+                    log('사용자에 의해 중지됨');
+                }
+                
+            } catch (error) {
+                log(`오류 발생: ${error.message}`);
+            } finally {
+                // UI 상태 복원
+                document.getElementById('startBtn').style.display = 'block';
+                document.getElementById('stopBtn').style.display = 'none';
+                isRunning = false;
+            }
+        }
+        
+        // 네이버 로그인 (시뮬레이션)
+        async function loginToNaver(naverId, naverPassword) {
+            log('네이버 로그인 페이지로 이동...');
+            
+            // 실제 로그인은 브라우저 보안 정책으로 인해 제한적
+            // 사용자가 수동으로 로그인하도록 안내
+            log('보안상 자동 로그인이 제한됩니다.');
+            log('브라우저에서 직접 네이버에 로그인해주세요.');
+            log('로그인 완료 후 URL들이 자동으로 열립니다.');
+            
+            // 네이버 로그인 페이지 열기
+            window.open('https://nid.naver.com/nidlogin.login', '_blank');
+            
+            // 사용자 확인 대기
+            await new Promise(resolve => {
+                setTimeout(() => {
+                    if (confirm('네이버 로그인을 완료하셨나요?\n확인을 누르면 URL 열기를 시작합니다.')) {
+                        log('사용자 확인 - URL 열기 시작');
+                        resolve();
+                    } else {
+                        log('사용자 취소 - 자동화 중지');
+                        isRunning = false;
+                        resolve();
+                    }
+                }, 3000);
+            });
+        }
+        
+        // 자동화 중지
+        function stopAutomation() {
+            isRunning = false;
+            log('사용자에 의해 자동화가 중지되었습니다.');
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+        }
+        
+        // 대기 함수
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
         // PWA 설치 기능
         let deferredPrompt;
         
@@ -146,21 +350,6 @@
             e.preventDefault();
             deferredPrompt = e;
         });
-        
-        function installApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('사용자가 앱 설치를 수락했습니다');
-                    }
-                    deferredPrompt = null;
-                });
-            } else {
-                // 수동 설치 안내
-                alert('Safari에서 공유 버튼을 탭한 후 "홈 화면에 추가"를 선택하세요!');
-            }
-        }
         
         // 서비스 워커 등록
         if ('serviceWorker' in navigator) {
