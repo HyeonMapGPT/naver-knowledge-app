@@ -196,6 +196,7 @@ https://kin.naver.com/qna/detail.naver?d1id=6&dirId=60103&docId=477548341&enc=ut
             <h3>🚀 자동화 실행</h3>
             <button class="btn" id="startBtn" onclick="startAutomation()">네이버 로그인 및 URL 자동 열기 시작</button>
             <button class="btn" id="stopBtn" onclick="stopAutomation()" style="background: #dc3545; display: none;">자동화 중지</button>
+            <button class="btn" id="loginCompleteBtn" onclick="confirmLoginComplete()" style="background: #17a2b8; display: none;">로그인 완료 확인</button>
         </div>
         
         <!-- 로그 영역 -->
@@ -255,36 +256,30 @@ https://kin.naver.com/qna/detail.naver?d1id=6&dirId=60103&docId=477548341&enc=ut
             
             // UI 상태 변경
             document.getElementById('startBtn').style.display = 'none';
-            document.getElementById('stopBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('loginCompleteBtn').style.display = 'block';
             isRunning = true;
             
-            // 자동화 실행
-            runAutomation(naverId, naverPassword);
+            // 네이버 로그인 페이지로 이동
+            log('네이버 로그인 페이지로 이동 중...');
+            log('로그인을 완료한 후 "로그인 완료 확인" 버튼을 클릭하세요.');
+            
+            // 3초 후 네이버 로그인 페이지로 이동
+            setTimeout(() => {
+                window.location.href = 'https://nid.naver.com/nidlogin.login';
+            }, 3000);
         }
         
         // 자동화 실행
         async function runAutomation(naverId, naverPassword) {
             try {
-                // 1. 네이버 로그인
-                log('네이버 로그인 시도 중...');
-                await loginToNaver(naverId, naverPassword);
+                // 1. 네이버 로그인 (모바일용)
+                log('네이버 로그인 페이지로 이동...');
+                await loginToNaverMobile();
                 
-                // 2. URL들 순차적으로 열기
+                // 2. URL들 순차적으로 열기 (모바일용)
                 log('URL들을 순차적으로 열기 시작...');
-                for (let i = 0; i < currentUrls.length; i++) {
-                    if (!isRunning) break;
-                    
-                    const url = currentUrls[i].trim();
-                    if (url) {
-                        log(`${i + 1}/${currentUrls.length}: ${url} 열기 중...`);
-                        window.open(url, '_blank');
-                        
-                        // 2-3초 랜덤 대기
-                        const waitTime = Math.random() * 1000 + 2000; // 2-3초
-                        log(`다음 URL까지 ${Math.round(waitTime/1000)}초 대기...`);
-                        await sleep(waitTime);
-                    }
-                }
+                await openUrlsSequentially();
                 
                 if (isRunning) {
                     log('모든 URL 열기 완료!');
@@ -298,36 +293,61 @@ https://kin.naver.com/qna/detail.naver?d1id=6&dirId=60103&docId=477548341&enc=ut
                 // UI 상태 복원
                 document.getElementById('startBtn').style.display = 'block';
                 document.getElementById('stopBtn').style.display = 'none';
+                document.getElementById('loginCompleteBtn').style.display = 'none'; // 로그인 완료 버튼 숨김
                 isRunning = false;
             }
         }
         
-        // 네이버 로그인 (시뮬레이션)
-        async function loginToNaver(naverId, naverPassword) {
-            log('네이버 로그인 페이지로 이동...');
+        // 모바일용 네이버 로그인
+        async function loginToNaverMobile() {
+            log('네이버 로그인 페이지로 이동 중...');
+            log('현재 탭에서 네이버 로그인 페이지가 열립니다.');
+            log('로그인을 완료한 후 이 페이지로 돌아와주세요.');
             
-            // 실제 로그인은 브라우저 보안 정책으로 인해 제한적
-            // 사용자가 수동으로 로그인하도록 안내
-            log('보안상 자동 로그인이 제한됩니다.');
-            log('브라우저에서 직접 네이버에 로그인해주세요.');
-            log('로그인 완료 후 URL들이 자동으로 열립니다.');
+            // 현재 탭에서 네이버 로그인 페이지 열기
+            window.location.href = 'https://nid.naver.com/nidlogin.login';
             
-            // 네이버 로그인 페이지 열기
-            window.open('https://nid.naver.com/nidlogin.login', '_blank');
-            
-            // 사용자 확인 대기
-            await new Promise(resolve => {
-                setTimeout(() => {
-                    if (confirm('네이버 로그인을 완료하셨나요?\n확인을 누르면 URL 열기를 시작합니다.')) {
-                        log('사용자 확인 - URL 열기 시작');
-                        resolve();
+            // 이 함수는 실행되지 않음 (페이지 이동으로 인해)
+            // 사용자가 로그인 후 수동으로 돌아와야 함
+        }
+        
+        // 모바일용 URL 순차 열기
+        async function openUrlsSequentially() {
+            for (let i = 0; i < currentUrls.length; i++) {
+                if (!isRunning) break;
+                
+                const url = currentUrls[i].trim();
+                if (url) {
+                    log(`${i + 1}/${currentUrls.length}: ${url}`);
+                    
+                    // 사용자 확인 후 URL 열기
+                    const shouldOpen = confirm(`다음 URL로 이동하시겠습니까?\n\n${url}\n\n확인: 이동\n취소: 건너뛰기`);
+                    
+                    if (shouldOpen) {
+                        log('URL로 이동 중...');
+                        // 현재 탭에서 URL 열기
+                        window.location.href = url;
+                        return; // 페이지 이동으로 인해 함수 종료
                     } else {
-                        log('사용자 취소 - 자동화 중지');
-                        isRunning = false;
-                        resolve();
+                        log('URL 건너뛰기');
                     }
-                }, 3000);
-            });
+                }
+            }
+            
+            log('모든 URL 처리 완료!');
+        }
+        
+        // 로그인 완료 확인 함수 (사용자가 수동으로 호출)
+        function confirmLoginComplete() {
+            log('로그인 완료 확인됨');
+            log('이제 URL들을 순차적으로 열겠습니다...');
+            
+            // 버튼 상태 변경
+            document.getElementById('loginCompleteBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'block';
+            
+            // URL 열기 시작
+            openUrlsSequentially();
         }
         
         // 자동화 중지
@@ -336,6 +356,7 @@ https://kin.naver.com/qna/detail.naver?d1id=6&dirId=60103&docId=477548341&enc=ut
             log('사용자에 의해 자동화가 중지되었습니다.');
             document.getElementById('startBtn').style.display = 'block';
             document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('loginCompleteBtn').style.display = 'none'; // 로그인 완료 버튼 숨김
         }
         
         // 대기 함수
