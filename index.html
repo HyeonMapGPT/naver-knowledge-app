@@ -266,38 +266,40 @@ https://kin.naver.com/qna/detail.naver?d1id=6&dirId=60103&docId=477548341&enc=ut
         
         // 모바일용 URL 순차 열기
         async function openUrlsSequentially() {
-            for (let i = 0; i < currentUrls.length; i++) {
-                if (!isRunning) break;
-                
-                const url = currentUrls[i].trim();
-                if (url) {
-                    log(`${i + 1}/${currentUrls.length}: ${url}`);
-                    
-                    // 진행 상황 팝업
-                    const progressMessage = `진행 상황: ${i + 1}/${currentUrls.length}\n\n다음 URL로 이동하시겠습니까?\n\n${url}\n\n확인: 7초 후 자동 이동\n취소: 건너뛰기`;
-                    
-                    const shouldOpen = confirm(progressMessage);
-                    
-                    if (shouldOpen) {
-                        log('URL로 이동 중...');
-                        log('7초 후 자동으로 이동합니다...');
-                        
-                        // 7초 후 자동 이동
-                        setTimeout(() => {
-                            if (isRunning) {
-                                log('이동 시작!');
-                                window.location.href = url;
-                            }
-                        }, 7000);
-                        
-                        return; // 페이지 이동으로 인해 함수 종료
-                    } else {
-                        log('URL 건너뛰기');
-                    }
-                }
-            }
+            // URL 목록을 localStorage에 저장
+            localStorage.setItem('urlList', JSON.stringify(currentUrls));
+            localStorage.setItem('currentIndex', '0');
             
-            log('모든 URL 처리 완료!');
+            log('URL 목록이 저장되었습니다.');
+            log('첫 번째 URL로 이동합니다...');
+            
+            // 첫 번째 URL로 이동
+            const firstUrl = currentUrls[0];
+            if (firstUrl) {
+                log(`1/${currentUrls.length}: ${firstUrl}`);
+                log('7초 후 자동으로 다음 URL로 이동합니다.');
+                
+                // 7초 후 자동으로 다음 URL로 이동
+                setTimeout(() => {
+                    const urls = JSON.parse(localStorage.getItem('urlList') || '[]');
+                    const currentIndex = parseInt(localStorage.getItem('currentIndex') || '0');
+                    const nextUrl = urls[currentIndex + 1];
+                    
+                    if (nextUrl) {
+                        localStorage.setItem('currentIndex', currentIndex + 1);
+                        log(`${currentIndex + 2}/${urls.length}: ${nextUrl}`);
+                        log('다음 URL로 이동합니다...');
+                        window.location.href = nextUrl;
+                    } else {
+                        log('모든 URL 처리 완료!');
+                        localStorage.removeItem('urlList');
+                        localStorage.removeItem('currentIndex');
+                    }
+                }, 7000);
+                
+                // 첫 번째 URL로 이동
+                window.location.href = firstUrl;
+            }
         }
         
         // 자동화 중지
@@ -331,6 +333,32 @@ https://kin.naver.com/qna/detail.naver?d1id=6&dirId=60103&docId=477548341&enc=ut
                     console.log('SW 등록 실패:', registrationError);
                 });
         }
+        
+        // 페이지 로드 시 자동 URL 이동 처리
+        window.addEventListener('load', function() {
+            // URL 목록이 저장되어 있는지 확인
+            const urlList = localStorage.getItem('urlList');
+            if (urlList) {
+                const urls = JSON.parse(urlList);
+                const currentIndex = parseInt(localStorage.getItem('currentIndex') || '0');
+                const nextUrl = urls[currentIndex + 1];
+                
+                if (nextUrl) {
+                    console.log(`7초 후 다음 URL로 이동: ${nextUrl}`);
+                    
+                    // 7초 후 자동으로 다음 URL로 이동
+                    setTimeout(() => {
+                        localStorage.setItem('currentIndex', currentIndex + 1);
+                        console.log(`이동 시작: ${nextUrl}`);
+                        window.location.href = nextUrl;
+                    }, 7000);
+                } else {
+                    console.log('모든 URL 처리 완료!');
+                    localStorage.removeItem('urlList');
+                    localStorage.removeItem('currentIndex');
+                }
+            }
+        });
     </script>
 </body>
 </html> 
