@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>네이버 지식인 자동화</title>
+    <title>네이버 지식인</title>
     <meta name="theme-color" content="#03c75a">
     <style>
         * {
@@ -154,13 +154,42 @@
             color: #666;
             margin-top: 10px;
         }
+        
+        .links-area {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .links-area a {
+            display: block;
+            color: #03c75a;
+            text-decoration: none;
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+            word-break: break-all;
+        }
+        
+        .links-area a:hover {
+            background: #e8f5e8;
+            color: #00a651;
+        }
+        
+        .links-area a:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="logo">N</div>
         <h1>네이버 지식인 자동화</h1>
-        <p class="subtitle">7초마다 자동으로 다음 URL로 이동합니다</p>
+        <p class="subtitle">URL을 입력하면 클릭 가능한 링크로 변환됩니다</p>
         
         <!-- URL 입력 섹션 -->
         <div class="section">
@@ -177,31 +206,34 @@ https://kin.naver.com/qna/detail.naver?d1id=6&dirId=60103&docId=477548341&enc=ut
             </div>
         </div>
         
+        <!-- 클릭 가능한 링크 목록 -->
+        <div class="section">
+            <h3>🔗 클릭 가능한 링크 목록</h3>
+            <div id="linksArea" class="links-area">
+                URL을 입력하면 여기에 클릭 가능한 링크가 나타납니다.
+            </div>
+        </div>
+        
         <!-- 실행 버튼 -->
         <div class="section">
-            <h3>🚀 자동화 실행</h3>
-            <button class="btn" id="startBtn" onclick="startAutomation()">URL 자동 열기 시작</button>
-            <button class="btn" id="stopBtn" onclick="stopAutomation()" style="background: #dc3545; display: none;">자동화 중지</button>
+            <h3>🚀 링크 생성</h3>
+            <button class="btn" id="generateBtn" onclick="createClickableLinks()">링크 목록 생성</button>
         </div>
         
         <!-- 로그 영역 -->
         <div class="section">
             <h3>📋 실행 로그</h3>
             <div class="log-area" id="logArea">
-                URL 목록을 입력하고 "시작" 버튼을 클릭하세요.
+                URL 목록을 입력하면 자동으로 클릭 가능한 링크가 생성됩니다.
             </div>
         </div>
         
         <div class="status">
-            🎯 7초마다 자동으로 다음 URL로 이동합니다!
+            🎯 각 링크를 클릭하면 새 탭에서 열립니다!
         </div>
     </div>
 
     <script>
-        let isRunning = false;
-        let currentUrls = [];
-        let currentIndex = 0;
-        
         // 로그 출력 함수
         function log(message) {
             const logArea = document.getElementById('logArea');
@@ -210,135 +242,46 @@ https://kin.naver.com/qna/detail.naver?d1id=6&dirId=60103&docId=477548341&enc=ut
             logArea.scrollTop = logArea.scrollHeight;
         }
         
-        // 자동화 시작
-        function startAutomation() {
-            const urlList = document.getElementById('urlList').value.trim();
+        // 클릭 가능한 링크 생성
+        function createClickableLinks() {
+            const urlList = document.getElementById('urlList').value;
+            const linksArea = document.getElementById('linksArea');
             
-            // 입력 검증
-            if (!urlList) {
-                alert('지식인 URL 목록을 입력해주세요!');
+            if (!urlList.trim()) {
+                linksArea.innerHTML = 'URL을 입력하면 여기에 클릭 가능한 링크가 나타납니다.';
                 return;
             }
             
-            // URL 목록 파싱
-            currentUrls = urlList.split('\n').filter(url => url.trim());
+            const urls = urlList.split('\n').filter(url => url.trim());
             
-            if (currentUrls.length === 0) {
-                alert('유효한 URL이 없습니다!');
+            if (urls.length === 0) {
+                linksArea.innerHTML = '유효한 URL이 없습니다.';
                 return;
             }
             
-            log(`자동화 시작: ${currentUrls.length}개의 URL`);
-            log('URL들을 순차적으로 열기 시작...');
+            linksArea.innerHTML = '';
             
-            // UI 상태 변경
-            document.getElementById('startBtn').style.display = 'none';
-            document.getElementById('stopBtn').style.display = 'block';
-            isRunning = true;
-            
-            // URL 열기 시작
-            openUrlsSequentially();
-        }
-        
-        // 자동화 실행
-        async function runAutomation() {
-            try {
-                // 1. URL들 순차적으로 열기 (모바일용)
-                log('URL들을 순차적으로 열기 시작...');
-                await openUrlsSequentially();
+            urls.forEach((url, index) => {
+                const link = document.createElement('a');
+                link.href = url.trim();
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.textContent = `${index + 1}. ${url.trim()}`;
+                link.title = '새 탭에서 열기';
                 
-                if (isRunning) {
-                    log('모든 URL 열기 완료!');
-                } else {
-                    log('사용자에 의해 중지됨');
+                linksArea.appendChild(link);
+                
+                // 마지막 링크가 아니면 줄바꿈 추가
+                if (index < urls.length - 1) {
+                    linksArea.appendChild(document.createElement('br'));
                 }
-                
-            } catch (error) {
-                log(`오류 발생: ${error.message}`);
-            } finally {
-                // UI 상태 복원
-                document.getElementById('startBtn').style.display = 'block';
-                document.getElementById('stopBtn').style.display = 'none';
-                isRunning = false;
-            }
-        }
-        
-        // 모바일용 URL 순차 열기
-        async function openUrlsSequentially() {
-            // URL 목록을 localStorage에 저장
-            localStorage.setItem('urlList', JSON.stringify(currentUrls));
-            localStorage.setItem('currentIndex', '0');
+            });
             
-            log('URL 목록이 저장되었습니다.');
-            log('첫 번째 URL로 이동합니다...');
-            
-            // 첫 번째 URL로 이동
-            const firstUrl = currentUrls[0];
-            if (firstUrl) {
-                log(`1/${currentUrls.length}: ${firstUrl}`);
-                log('7초 후 자동으로 다음 URL로 이동합니다.');
-                
-                // 7초 후 자동으로 다음 URL로 이동
-                setTimeout(() => {
-                    const urls = JSON.parse(localStorage.getItem('urlList') || '[]');
-                    const currentIndex = parseInt(localStorage.getItem('currentIndex') || '0');
-                    const nextUrl = urls[currentIndex + 1];
-                    
-                    if (nextUrl) {
-                        localStorage.setItem('currentIndex', currentIndex + 1);
-                        log(`${currentIndex + 2}/${urls.length}: ${nextUrl}`);
-                        log('다음 URL로 이동합니다...');
-                        window.location.href = nextUrl;
-                    } else {
-                        log('모든 URL 처리 완료!');
-                        localStorage.removeItem('urlList');
-                        localStorage.removeItem('currentIndex');
-                    }
-                }, 7000);
-                
-                // 첫 번째 URL로 이동
-                window.location.href = firstUrl;
-            }
+            log(`총 ${urls.length}개의 클릭 가능한 링크가 생성되었습니다.`);
         }
         
-        // 자동화 중지
-        function stopAutomation() {
-            isRunning = false;
-            log('사용자에 의해 자동화가 중지되었습니다.');
-            document.getElementById('startBtn').style.display = 'block';
-            document.getElementById('stopBtn').style.display = 'none';
-        }
-        
-        // 대기 함수
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-        
-        // 페이지 로드 시 자동 URL 이동 처리
-        window.addEventListener('load', function() {
-            // URL 목록이 저장되어 있는지 확인
-            const urlList = localStorage.getItem('urlList');
-            if (urlList) {
-                const urls = JSON.parse(urlList);
-                const currentIndex = parseInt(localStorage.getItem('currentIndex') || '0');
-                const nextUrl = urls[currentIndex + 1];
-                
-                if (nextUrl) {
-                    console.log(`7초 후 다음 URL로 이동: ${nextUrl}`);
-                    
-                    // 7초 후 자동으로 다음 URL로 이동
-                    setTimeout(() => {
-                        localStorage.setItem('currentIndex', currentIndex + 1);
-                        console.log(`이동 시작: ${nextUrl}`);
-                        window.location.href = nextUrl;
-                    }, 7000);
-                } else {
-                    console.log('모든 URL 처리 완료!');
-                    localStorage.removeItem('urlList');
-                    localStorage.removeItem('currentIndex');
-                }
-            }
-        });
+        // URL 입력 시 자동으로 링크 생성
+        document.getElementById('urlList').addEventListener('input', createClickableLinks);
     </script>
 </body>
 </html> 
