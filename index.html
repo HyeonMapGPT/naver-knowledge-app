@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>네이버 지식인 자동화</title>
-    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#03c75a">
     <style>
         * {
@@ -161,7 +160,7 @@
     <div class="container">
         <div class="logo">N</div>
         <h1>네이버 지식인 자동화</h1>
-        <p class="subtitle">아이폰에서 앱처럼 사용하세요</p>
+        <p class="subtitle">7초마다 자동으로 다음 URL로 이동합니다</p>
         
         <!-- URL 입력 섹션 -->
         <div class="section">
@@ -194,7 +193,7 @@ https://kin.naver.com/qna/detail.naver?d1id=6&dirId=60103&docId=477548341&enc=ut
         </div>
         
         <div class="status">
-            🎯 PWA 앱으로 설치하여 재인증 없이 사용 가능!
+            🎯 7초마다 자동으로 다음 URL로 이동합니다!
         </div>
     </div>
 
@@ -313,25 +312,6 @@ https://kin.naver.com/qna/detail.naver?d1id=6&dirId=60103&docId=477548341&enc=ut
         // 대기 함수
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
-        }
-        
-        // PWA 설치 기능
-        let deferredPrompt;
-        
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
-        
-        // 서비스 워커 등록
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then((registration) => {
-                    console.log('SW 등록 성공:', registration);
-                })
-                .catch((registrationError) => {
-                    console.log('SW 등록 실패:', registrationError);
-                });
         }
         
         // 페이지 로드 시 자동 URL 이동 처리
