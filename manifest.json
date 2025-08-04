@@ -2,7 +2,7 @@
   "name": "네이버 지식인 자동화",
   "short_name": "네이버자동화",
   "description": "네이버 지식인 자동화 도구",
-  "start_url": "/",
+  "start_url": "/naver-knowledge-app/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#03c75a",
