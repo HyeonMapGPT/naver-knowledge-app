@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>네이버 지식인 자동화</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#03c75a">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #03c75a, #00a651);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: #03c75a;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .feature {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: left;
+        }
+        
+        .feature h3 {
+            color: #03c75a;
+            margin-bottom: 5px;
+        }
+        
+        .feature p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .install-btn {
+            background: #03c75a;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .install-btn:hover {
+            background: #00a651;
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            background: #e8f5e8;
+            color: #2d5a2d;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">N</div>
+        <h1>네이버 지식인 자동화</h1>
+        <p class="subtitle">아이폰에서 앱처럼 사용하세요</p>
+        
+        <div class="feature">
+            <h3>✅ 자동 로그인</h3>
+            <p>네이버 계정으로 자동 로그인</p>
+        </div>
+        
+        <div class="feature">
+            <h3>✅ URL 자동 열기</h3>
+            <p>복사한 URL들을 순차적으로 자동 열기</p>
+        </div>
+        
+        <div class="feature">
+            <h3>✅ 계정 관리</h3>
+            <p>여러 계정을 안전하게 관리</p>
+        </div>
+        
+        <div class="status">
+            🎯 PWA 앱으로 설치하여 재인증 없이 사용 가능!
+        </div>
+        
+        <button class="install-btn" onclick="installApp()">
+            홈 화면에 추가
+        </button>
+        
+        <p style="color: #999; font-size: 12px; margin-top: 20px;">
+            Safari에서 공유 버튼 → "홈 화면에 추가" 선택
+        </p>
+    </div>
+
+    <script>
+        // PWA 설치 기능
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+        
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('사용자가 앱 설치를 수락했습니다');
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                // 수동 설치 안내
+                alert('Safari에서 공유 버튼을 탭한 후 "홈 화면에 추가"를 선택하세요!');
+            }
+        }
+        
+        // 서비스 워커 등록
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then((registration) => {
+                    console.log('SW 등록 성공:', registration);
+                })
+                .catch((registrationError) => {
+                    console.log('SW 등록 실패:', registrationError);
+                });
+        }
+    </script>
+</body>
+</html> 
